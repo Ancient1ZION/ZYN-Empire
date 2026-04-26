@@ -1,0 +1,57 @@
+{
+    "metadata": {
+          "version": "1.0",
+          "system": "ZYN EMPIRE",
+          "created": "2026-04-26",
+          "architect": "Ancient1ZION"
+    },
+    "agents": [
+          {"id": "agent_01", "name": "Noah", "role": "Architect", "status": "ACTIVE"},
+          {"id": "agent_02", "name": "Sara", "role": "Outreach", "status": "ACTIVE"},
+          {"id": "agent_03", "name": "Malik", "role": "Closer", "status": "ACTIVE"},
+          {"id": "agent_04", "name": "Elijah", "role": "Signals", "status": "ACTIVE"},
+          {"id": "agent_05", "name": "Adam", "role": "Gov Scout", "status": "ACTIVE"},
+          {"id": "agent_06", "name": "Ruth", "role": "CRM", "status": "ACTIVE"},
+          {"id": "agent_07", "name": "Lea", "role": "Client", "status": "ACTIVE"},
+          {"id": "agent_08", "name": "Zara", "role": "LinkedIn", "status": "ACTIVE"},
+          {"id": "agent_09", "name": "Ezekiel", "role": "APIs", "status": "ACTIVE"},
+          {"id": "agent_10", "name": "Samson", "role": "Backup", "status": "ACTIVE"},
+          {"id": "agent_11", "name": "Cyrus", "role": "Strategy", "status": "ACTIVE"},
+          {"id": "agent_12", "name": "Asher", "role": "Health", "status": "ACTIVE"},
+          {"id": "agent_13", "name": "Rebecca", "role": "Partners", "status": "ACTIVE"},
+          {"id": "agent_14", "name": "Zuri", "role": "Brand", "status": "ACTIVE"},
+          {"id": "agent_15", "name": "Mariam", "role": "Intel", "status": "ACTIVE"},
+          {"id": "agent_16", "name": "Enoch", "role": "Opp Hunt", "status": "ACTIVE"},
+          {"id": "agent_17", "name": "Juda", "role": "Security", "status": "ACTIVE"},
+          {"id": "agent_18", "name": "Miro Fish", "role": "Voice", "status": "ACTIVE"},
+          {"id": "agent_19", "name": "Caleb", "role": "Capital", "status": "ACTIVE"}
+    ],
+    "execution": {
+          "mode": "AUTONOMOUS",
+          "demo_mode": true,
+          "task_timeout": 30,
+          "retry_count": 2,
+          "log_level": "INFO"
+    },
+    "integrations": {
+          "discord": {
+                  "enabled": false,
+                  "token_env": "DISCORD_TOKEN",
+                  "channels": 20
+          },
+          "google_sheets": {
+                  "enabled": false,
+                  "api_key_env": "GOOGLE_API_KEY",
+                  "spreadsheet_id": "1WHN438mjORT4HnGiXapWv78uomVy6KMhHsl0llxaeQk"
+          },
+          "sam_gov": {
+                  "enabled": false,
+                  "api_key_env": "SAM_GOV_API_KEY"
+          }
+    },
+    "dry_run_defaults": {
+          "sample_tasks": 5,
+          "simulate_execution": true,
+          "generate_report": true
+    }
+}
