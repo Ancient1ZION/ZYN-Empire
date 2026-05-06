@@ -6,7 +6,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { execSync } = require('child_process');
 const fs = require('fs');
 
-const token = fs.readFileSync('/root/zyn/token.txt', 'utf8').trim();
+const token = fs.readFileSync('/home/zion/zyn/token.txt', 'utf8').trim();
 
 // === FILL THESE IN after running channel_discovery.js ===
 const CHANNELS = {
@@ -26,7 +26,7 @@ const client = new Client({
 
 function getTradingReport() {
     try {
-          const price = execSync('python3 /root/zyn/price_fetch.py', { timeout: 10000 }).toString().trim();
+          const price = execSync('python3 /home/zion/zyn/price_fetch.py', { timeout: 10000 }).toString().trim();
           return `**[ZYN TRADING ALERT]** ${new Date().toLocaleTimeString()}\nNQ Live Price: **${price}**\nZenith Signal: STALKING 150pt move\nCaleb Status: ACTIVE`;
     } catch (e) {
           return `**[ZYN TRADING ALERT]** ${new Date().toLocaleTimeString()}\nNQ Signal: Monitoring\nCaleb Status: ACTIVE\n_price_fetch.py: ${e.message}_`;
