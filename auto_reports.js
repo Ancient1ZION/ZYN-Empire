@@ -6,7 +6,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { execSync } = require('child_process');
 const fs = require('fs');
 
-const token = fs.readFileSync('/root/zyn/token.txt', 'utf8').trim();
+const token = fs.readFileSync('/home/zion/zyn/token.txt', 'utf8').trim();
 
 // === FILL THESE IN after running channel_discovery.js ===
 const CHANNELS = {
