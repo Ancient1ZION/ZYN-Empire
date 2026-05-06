@@ -6,7 +6,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { execSync } = require('child_process');
 const fs = require('fs');
 
-const token = fs.readFileSync('/root/zyn/token.txt', 'utf8').trim();
+const token = fs.readFileSync('/home/zion/zyn/token.txt', 'utf8').trim();
 
 const client = new Client({
     intents: [
@@ -40,7 +40,7 @@ function getMoneyResponse() {
 
 function getTradeResponse() {
     try {
-          const price = execSync('python3 /root/zyn/price_fetch.py', { timeout: 10000 }).toString().trim();
+           const price = execSync('python3 /home/zion/zyn/price_fetch.py', { timeout: 10000 }).toString().trim();
           return `**[ZYN TRADE STATUS]** ${new Date().toLocaleTimeString()}\n\nNQ Live Price: **${price}**\nZenith Signal: STALKING 150pt move\nTarget: +150 Points ($3,000)\nCaleb Status: ACTIVE`;
     } catch (e) {
           return `**[ZYN TRADE STATUS]** ${new Date().toLocaleTimeString()}\n\nNQ Signal: Monitoring\nZenith: STALKING 150pt pivot\nCaleb Status: ACTIVE\n_Run price_fetch.py to enable live data_`;
