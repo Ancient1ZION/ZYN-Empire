@@ -3,6 +3,14 @@
 // No prefix required - just type the keyword in any channel
 // Updated: 2026-05-11 — Fixed token path, removed Apollo references, expanded agent commands
 
+process.on('unhandledRejection', (reason, promise) => {
+    console.error(`[NOAH CRASH] Unhandled Rejection:`, reason);
+});
+process.on('uncaughtException', (error) => {
+    console.error(`[NOAH CRASH] Uncaught Exception:`, error);
+    setTimeout(() => process.exit(1), 1000);
+});
+
 const { Client, GatewayIntentBits } = require('discord.js');
 const { execSync } = require('child_process');
 const fs = require('fs');

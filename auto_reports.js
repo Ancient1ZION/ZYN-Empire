@@ -2,6 +2,14 @@
 // Runs under PM2 and posts automated updates every 60 minutes
 // Updated: 2026-05-11 — All channel IDs verified from channel_discovery.js
 
+process.on('unhandledRejection', (reason, promise) => {
+    console.error(`[AUTO-REPORTS CRASH] Unhandled Rejection:`, reason);
+});
+process.on('uncaughtException', (error) => {
+    console.error(`[AUTO-REPORTS CRASH] Uncaught Exception:`, error);
+    setTimeout(() => process.exit(1), 1000);
+});
+
 const { Client, GatewayIntentBits } = require('discord.js');
 const { execSync } = require('child_process');
 const fs = require('fs');

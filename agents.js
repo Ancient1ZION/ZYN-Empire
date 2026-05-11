@@ -2,6 +2,14 @@
 // Sara, Malik, Adam, Elijah, Lea, Caleb
 // Each agent posts every 60 minutes to their dedicated channel
 
+process.on('unhandledRejection', (reason, promise) => {
+    console.error(`[ZYN AGENTS CRASH] Unhandled Rejection:`, reason);
+});
+process.on('uncaughtException', (error) => {
+    console.error(`[ZYN AGENTS CRASH] Uncaught Exception:`, error);
+    setTimeout(() => process.exit(1), 1000);
+});
+
 const { Client, GatewayIntentBits } = require('discord.js');
 const fs = require('fs');
 
@@ -34,7 +42,7 @@ const client = new Client({
 
 function saraReport() {
     const leads = Math.floor(Math.random() * 50) + 380; // 380-430
-  const opens = Math.floor(leads * 0.22);
+    const opens = Math.floor(leads * 0.22);
     const replies = Math.floor(opens * 0.15);
     return `**[SARA — LEAD STRIKE]** ${new Date().toLocaleTimeString()}
     Target: $1M–$20M revenue businesses | 10+ employees
@@ -93,7 +101,7 @@ function leaReport() {
 
 function calebReport() {
     const pts = Math.floor(Math.random() * 80) + 90; // 90-170
-  const pnl = (pts * 20).toLocaleString();
+    const pnl = (pts * 20).toLocaleString();
     const confidence = Math.floor(Math.random() * 15) + 80;
     return `**[CALEB — NQ TRADING]** ${new Date().toLocaleTimeString()}
     Mission: $250K+ account target

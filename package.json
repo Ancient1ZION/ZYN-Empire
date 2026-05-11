@@ -1,0 +1,20 @@
+{
+  "name": "zyn-empire",
+  "version": "2.0.0",
+  "description": "ZYN EMPIRE — Autonomous Discord Agents",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "noah": "node noah_discord.js",
+    "agents": "node agents.js",
+    "auto-reports": "node auto_reports.js",
+    "diagnose": "node diagnose_discord.js",
+    "dev": "node --watch noah_discord.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
