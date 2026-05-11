@@ -138,7 +138,7 @@ FINAL STATUS REPORT
 ## NEXT STEPS
 
 ### Step 1: Verify Dashboard
-Go to: https://ancient1zion.github.io/dashboard.html
+Go to: https://ancient1zion.github.io/zynwebsite
 
 Confirm:
 - ✅ All tabs load
