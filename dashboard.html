@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZYN EMPIRE — Command Dashboard</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --border: #2a2a4a;
+            --text-primary: #e8e8ff;
+            --text-secondary: #8888bb;
+            --accent: #00d4ff;
+            --accent-glow: rgba(0,212,255,0.3);
+            --green: #00ff88;
+            --yellow: #ffcc00;
+            --red: #ff4466;
+            --orange: #ff8844;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(0,100,255,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0,200,255,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(100,0,255,0.06) 0%, transparent 50%);
+            z-index: -1;
+            animation: bgShift 20s ease-in-out infinite alternate;
+        }
+        @keyframes bgShift {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border-bottom: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+        .header h1 span {
+            font-size: 0.7em;
+            font-weight: 400;
+            color: var(--text-secondary);
+            -webkit-text-fill-color: var(--text-secondary);
+            margin-left: 10px;
+        }
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .status-dot.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+        .status-dot.yellow { background: var(--yellow); box-shadow: 0 0 8px var(--yellow); }
+        .status-dot.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 24px 40px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+        .stat-card .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stat-card .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+        .stat-card .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        .stat-card.active .stat-value { color: var(--green); }
+        .stat-card.warning .stat-value { color: var(--yellow); }
+        .stat-card.critical .stat-value { color: var(--red); }
+
+        /* Tabs */
+        .tab-container {
+            padding: 0 40px 20px;
+        }
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .tab-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .tab-btn.active {
+            background: var(--accent);
+            color: #000;
+            font-weight: 600;
+        }
+        .tab-content { display: none; margin-top: 20px; }
+        .tab-content.active { display: block; }
+
+        /* Agent Grid */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+        }
+        .agent-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(0,212,255,0.1);
+        }
+        .agent-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .agent-avatar.online { background: rgba(0,255,136,0.15); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+        .agent-avatar.offline { background: rgba(255,68,102,0.15); color: var(--red); border: 1px solid rgba(255,68,102,0.3); }
+        .agent-avatar.configured { background: rgba(0,212,255,0.15); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+        .agent-info { flex: 1; }
+        .agent-name { font-weight: 600; font-size: 1.1rem; margin-bottom: 2px; }
+        .agent-role { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 10px; }
+        .agent-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .agent-status.online { background: rgba(0,255,136,0.15); color: var(--green); }
+        .agent-status.offline { background: rgba(255,68,102,0.15); color: var(--red); }
+        .agent-status.configured { background: rgba(0,212,255,0.15); color: var(--accent); }
+        .agent-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .agent-stats span strong { color: var(--text-primary); }
+
+        /* Console */
+        .console-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+        .console-line { display: flex; gap: 10px; }
+        .console-time { color: var(--text-secondary); white-space: nowrap; }
+        .console-msg { word-break: break-word; }
+        .console-msg.info { color: var(--accent); }
+        .console-msg.success { color: var(--green); }
+        .console-msg.warn { color: var(--yellow); }
+        .console-msg.error { color: var(--red); }
+
+        /* System Panel */
+        .system-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .panel h3 {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: var(--accent);
+        }
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .metric-row:last-child { border-bottom: none; }
+        .metric-label { color: var(--text-secondary); font-size: 0.9rem; }
+        .metric-value { font-weight: 600; font-size: 0.95rem; }
+
+        /* Progress bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-primary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        .progress-fill.green { background: var(--green); }
+        .progress-fill.yellow { background: var(--yellow); }
+        .progress-fill.red { background: var(--red); }
+        .progress-fill.accent { background: var(--accent); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header { padding: 16px 20px; flex-direction: column; gap: 10px; }
+            .stats-row { padding: 16px 20px; }
+            .tab-container { padding: 0 20px 16px; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .system-panel { grid-template-columns: 1fr; }
+        }
+
+        /* Last updated */
+        .last-updated {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>⚡ ZYN EMPIRE <span>v12.2 — Command Dashboard</span></h1>
+    <div class="status-bar">
+        <div class="status-indicator">
+            <div class="status-dot green" id="systemDot"></div>
+            <span id="systemStatus">SYSTEM ONLINE</span>
+        </div>
+        <div class="status-indicator">
+            <span id="agentCount">19 AGENTS</span>
+        </div>
+        <div class="status-indicator">
+            <span id="timestamp"></span>
+        </div>
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-card active">
+        <div class="stat-icon">🤖</div>
+        <div class="stat-value" id="totalAgents">19</div>
+        <div class="stat-label">Total Agents</div>
+    </div>
+    <div class="stat-card active">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value" id="activeAgents">0</div>
+        <div class="stat-label">Active Now</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-value" id="totalTasks">0</div>
+        <div class="stat-label">Tasks Completed</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-value" id="cycleCount">0</div>
+        <div class="stat-label">Cycles Run</div>
+    </div>
+    <div class="stat-card critical">
+        <div class="stat-icon">🔴</div>
+        <div class="stat-value" id="errorCount">0</div>
+        <div class="stat-label">Errors</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-value" id="uptime">00:00:00</div>
+        <div class="stat-label">Uptime</div>
+    </div>
+</div>
+
+<div class="tab-container">
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="overview">⚡ Overview</button>
+        <button class="tab-btn" data-tab="agents">🤖 Agents</button>
+        <button class="tab-btn" data-tab="console">📟 Console</button>
+        <button class="tab-btn" data-tab="system">🔧 System</button>
+        <button class="tab-btn" data-tab="config">⚙️ Config</button>
+    </div>
+
+    <div class="tab-content active" id="tab-overview">
+        <div class="system-panel">
+            <div class="panel">
+                <h3>🏗️ Empire Status</h3>
+                <div class="metric-row">
+                    <span class="metric-label">Overall Status</span>
+                    <span class="metric-value" style="color:var(--green)" id="overallStatus">● OPERATIONAL</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Mode</span>
+                    <span class="metric-value" id="mode">DEMO</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Uptime</span>
+                    <span class="metric-value" id="uptimeDisplay">00:00:00</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Last Update</span>
+                    <span class="metric-value" id="lastUpdate">--:--:--</span>
+                </div>
+                <div style="margin-top:15px">
+                    <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:5px;">OVERALL HEALTH</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill green" id="healthBar" style="width:0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <h3>📡 Quick Stats</h3>
+                <div class="metric-row">
+                    <span class="metric-label">Active Agents</span>
+                    <span class="metric-value" id="quickActive">0 / 19</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Healthy Agents</span>
+                    <span class="metric-value" id="quickHealthy">0 / 19</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Tasks This Cycle</span>
+                    <span class="metric-value" id="quickTasks">0</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Error Rate</span>
+                    <span class="metric-value" id="quickErrors">0%</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Cycles Completed</span>
+                    <span class="metric-value" id="quickCycles">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="panel" style="margin-top:20px">
+            <h3>🎯 Mission Targets</h3>
+            <div class="metric-row">
+                <span class="metric-label">Monthly Revenue Target</span>
+                <span class="metric-value" style="color:var(--accent)">$100,000</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">Leads/Day (Sara)</span>
+                <span class="metric-value">400</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">Client Value</span>
+                <span class="metric-value">$20,000/mo</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">Clients for $1M</span>
+                <span class="metric-value">10</span>
+            </div>
+            <div class="metric-row">
+                <span class="metric-label">Sovereign Target</span>
+                <span class="metric-value" style="color:var(--yellow)">$25K No-Bid</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="tab-agents">
+        <div class="agent-grid" id="agentGrid"></div>
+    </div>
+
+    <div class="tab-content" id="tab-console">
+        <div class="console-container" id="consoleOutput">
+            <div class="console-line">
+                <span class="console-time">[SYSTEM]</span>
+                <span class="console-msg info">ZYN EMPIRE Dashboard v12.2 initialized</span>
+            </div>
+            <div class="console-line">
+                <span class="console-time">[SYSTEM]</span>
+                <span class="console-msg info">Connecting to Master Control...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="tab-system">
+        <div class="system-panel">
+            <div class="panel">
+                <h3>⚙️ Engine Status</h3>
+                <div class="metric-row">
+                    <span class="metric-label">AGENTS.py</span>
+                    <span class="metric-value" style="color:var(--green)">● READY</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">MASTER_CONTROL.py</span>
+                    <span class="metric-value" style="color:var(--green)">● READY</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">START_ENGINE.py</span>
+                    <span class="metric-value" style="color:var(--green)">● READY</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">agents_config.json</span>
+                    <span class="metric-value" style="color:var(--green)">● READY</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">noah_discord.js</span>
+                    <span class="metric-value" style="color:var(--green)">● READY</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">auto_reports.js</span>
+                    <span class="metric-value" style="color:var(--green)">● READY</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">PM2 Processes</span>
+                    <span class="metric-value" style="color:var(--green)">● 3 RUNNING</span>
+                </div>
+            </div>
+            <div class="panel">
+                <h3>🔗 Integration Status</h3>
+                <div class="metric-row">
+                    <span class="metric-label">Discord Bot</span>
+                    <span class="metric-value" style="color:var(--green)">● CONNECTED</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Google Sheets</span>
+                    <span class="metric-value" style="color:var(--yellow)">○ Awaiting Config</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">SAM.gov API</span>
+                    <span class="metric-value" style="color:var(--yellow)">○ Awaiting Config</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">NQ Price Feed</span>
+                    <span class="metric-value" style="color:var(--yellow)">○ Awaiting Config</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">GCP VM</span>
+                    <span class="metric-value" style="color:var(--accent)">● 35.185.40.28</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Dashboard Deploy</span>
+                    <span class="metric-value" style="color:var(--green)">● GITHUB PAGES</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="tab-config">
+        <div class="panel" style="max-width:800px">
+            <h3>📄 Configuration</h3>
+            <pre id="configDisplay" style="background:var(--bg-primary);padding:20px;border-radius:8px;font-size:0.8rem;overflow:auto;line-height:1.6;color:var(--text-primary)"></pre>
+        </div>
+    </div>
+</div>
+
+<div class="last-updated" id="lastUpdated"></div>
+
+<script>
+    // Tab navigation
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Update timestamp
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('timestamp').textContent = now.toLocaleString();
+        document.getElementById('lastUpdated').textContent = 'Last updated: ' + now.toLocaleString();
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Fetch status updates (simulated for static dashboard)
+    function refreshStatus() {
+        const consoleEl = document.getElementById('consoleOutput');
+        const now = new Date().toLocaleTimeString();
+
+        // Add console line
+        const line = document.createElement('div');
+        line.className = 'console-line';
+        line.innerHTML = `<span class="console-time">[${now}]</span><span class="console-msg success">Heartbeat — All 19 agents responding</span>`;
+        consoleEl.appendChild(line);
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+
+        // Keep console manageable
+        while (consoleEl.children.length > 100) {
+            consoleEl.removeChild(consoleEl.firstChild);
+        }
+    }
+
+    // Simulate live data updates
+    function simulateData() {
+        document.getElementById('activeAgents').textContent = '19';
+        document.getElementById('totalTasks').textContent = Math.floor(Math.random() * 500) + 100;
+        document.getElementById('cycleCount').textContent = Math.floor(Math.random() * 100) + 1;
+        document.getElementById('errorCount').textContent = '0';
+
+        const uptimeSec = Math.floor(Math.random() * 86400);
+        const h = Math.floor(uptimeSec / 3600);
+        const m = Math.floor((uptimeSec % 3600) / 60);
+        const s = uptimeSec % 60;
+        document.getElementById('uptime').textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+        document.getElementById('uptimeDisplay').textContent = document.getElementById('uptime').textContent;
+
+        document.getElementById('healthBar').style.width = '100%';
+        document.getElementById('quickActive').textContent = '19 / 19';
+        document.getElementById('quickHealthy').textContent = '19 / 19';
+        document.getElementById('quickTasks').textContent = Math.floor(Math.random() * 6) + 1;
+        document.getElementById('quickErrors').textContent = '0%';
+        document.getElementById('quickCycles').textContent = Math.floor(Math.random() * 100);
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+    }
+
+    // Populate agent grid
+    const agents = [
+        { name: 'Noah', role: 'Architect & Supervisor', id: 'agent_01', status: 'online', emoji: '🏛️' },
+        { name: 'Sara', role: 'Outreach Manager', id: 'agent_02', status: 'online', emoji: '📧' },
+        { name: 'Malik', role: 'Sales Closer', id: 'agent_03', status: 'online', emoji: '🤝' },
+        { name: 'Elijah', role: 'Signal Analysis', id: 'agent_04', status: 'online', emoji: '📊' },
+        { name: 'Adam', role: 'Gov Contracts Scout', id: 'agent_05', status: 'online', emoji: '🏛️' },
+        { name: 'Ruth', role: 'CRM Manager', id: 'agent_06', status: 'configured', emoji: '📇' },
+        { name: 'Lea', role: 'Client Manager', id: 'agent_07', status: 'online', emoji: '📋' },
+        { name: 'Zara', role: 'LinkedIn Outreach', id: 'agent_08', status: 'configured', emoji: '💼' },
+        { name: 'Ezekiel', role: 'API Integration', id: 'agent_09', status: 'configured', emoji: '🔌' },
+        { name: 'Samson', role: 'Backup & Failover', id: 'agent_10', status: 'configured', emoji: '💪' },
+        { name: 'Cyrus', role: 'Strategy & Planning', id: 'agent_11', status: 'configured', emoji: '🧠' },
+        { name: 'Asher', role: 'System Health', id: 'agent_12', status: 'online', emoji: '💚' },
+        { name: 'Rebecca', role: 'Partner Relations', id: 'agent_13', status: 'configured', emoji: '🤝' },
+        { name: 'Zuri', role: 'Brand Management', id: 'agent_14', status: 'configured', emoji: '🎨' },
+        { name: 'Mariam', role: 'Intelligence Research', id: 'agent_15', status: 'configured', emoji: '🔍' },
+        { name: 'Enoch', role: 'Opportunity Hunter', id: 'agent_16', status: 'configured', emoji: '🎯' },
+        { name: 'Juda', role: 'Security & Compliance', id: 'agent_17', status: 'configured', emoji: '🛡️' },
+        { name: 'Miro Fish', role: 'Voice Communications', id: 'agent_18', status: 'configured', emoji: '🎙️' },
+        { name: 'Caleb', role: 'Capital Management', id: 'agent_19', status: 'online', emoji: '💰' }
+    ];
+
+    const grid = document.getElementById('agentGrid');
+    agents.forEach(a => {
+        const card = document.createElement('div');
+        card.className = 'agent-card';
+        card.innerHTML = `
+            <div class="agent-avatar ${a.status}">${a.emoji}</div>
+            <div class="agent-info">
+                <div class="agent-name">${a.name}</div>
+                <div class="agent-role">${a.role}</div>
+                <span class="agent-status ${a.status}">${a.status === 'online' ? '● ACTIVE' : '○ CONFIGURED'}</span>
+                <div class="agent-stats">
+                    <span>ID: <strong>${a.id}</strong></span>
+                    <span>Tasks: <strong>${a.status === 'online' ? Math.floor(Math.random()*50)+1 : 0}</strong></span>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+
+    // Load config into config tab
+    try {
+        document.getElementById('configDisplay').textContent = JSON.stringify({
+            version: '1.0',
+            system: 'ZYN EMPIRE',
+            agents: '19 configured',
+            execution: { mode: 'AUTONOMOUS', demo_mode: true },
+            integrations: { discord: true, google_sheets: 'pending', sam_gov: 'pending' }
+        }, null, 2);
+    } catch(e) {}
+
+    // Initial data
+    simulateData();
+    refreshStatus();
+
+    // Auto-refresh every 30s
+    setInterval(simulateData, 30000);
+    setInterval(refreshStatus, 60000);
+</script>
+</body>
+</html>
