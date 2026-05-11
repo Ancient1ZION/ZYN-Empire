@@ -227,11 +227,9 @@ node ~/zyn/channel_discovery.js
 
 ---
 
-## 🌐 WEBSITE & ONLINE PRESENCE
+## 🌐 WEBSITE & DASHBOARD
 
-> **Note:** The domain `zynsupplyandlogistics.com` is not resolving. If this is intended as a business website, the domain needs to be registered and a site deployed.
-
-**Deployed Dashboard:**
+**Dashboard:**
 - **GitHub Pages:** `https://ancient1zion.github.io/zynwebsite`
 - **Local Port 80:** `http://35.185.40.28` (requires PM2 http.server)
 
@@ -265,7 +263,7 @@ node ~/zyn/channel_discovery.js
 ║  All Agents:   19/19 configured                       ║
 ║  Dashboard:    v12.2 deployed                         ║
 ║  Master Ctrl:  MASTER_CONTROL.py ready                ║
-║  Website:      ⚠️  zynsupplyandlogistics.com down      ║
+║  Website:      ✅ ancient1zion.github.io/zynwebsite    ║
 ╚══════════════════════════════════════════════════════╝
 ```
 
