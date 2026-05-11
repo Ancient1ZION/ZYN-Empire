@@ -232,7 +232,7 @@ node ~/zyn/channel_discovery.js
 > **Note:** The domain `zynsupplyandlogistics.com` is not resolving. If this is intended as a business website, the domain needs to be registered and a site deployed.
 
 **Deployed Dashboard:**
-- **GitHub Pages:** `https://ancient1zion.github.io/zynsl-website/dashboard.html`
+- **GitHub Pages:** `https://ancient1zion.github.io/dashboard.html`
 - **Local Port 80:** `http://35.185.40.28` (requires PM2 http.server)
 
 **Discord:**
